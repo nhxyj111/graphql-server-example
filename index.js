@@ -1,30 +1,42 @@
-const { ApolloServer, gql } = require('apollo-server')
+const { ApolloServer, gql, PubSub } = require('apollo-server')
+
+const pubsub = new PubSub()
+const SOMETHING_CHANGED_TOPIC = 'something_changed'
 
 const typeDefs = gql`
   type Query {
-    hello: Float
-    resolved: String
+    hello: String
+  }
+  type Subscription {
+    newMessage: String
   }
 `
 
 const resolvers = {
   Query: {
-    resolved: () => 'Resolved',
+    hello: () => 'hello',
   },
-}
-
-const mocks = {
-  Int: () => 6,
-  Float: () => 22.1,
-  String: () => 'Hello',
+  Subscription: {
+    newMessage: {
+      subscribe: () => pubsub.asyncIterator(SOMETHING_CHANGED_TOPIC),
+    },
+  },
 }
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  mocks,
 })
 
 server.listen().then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`)
 })
+
+//publish events every second
+setInterval(
+  () =>
+    pubsub.publish(SOMETHING_CHANGED_TOPIC, {
+      newMessage: new Date().toString(),
+    }),
+  1000
+)
