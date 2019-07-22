@@ -26,6 +26,11 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  // onHealthCheck: () =>
+  //   new Promise((resolve, reject) => {
+  //     //database check or other asynchronous action
+  //     reject(500)
+  //   }),
 })
 
 server.listen().then(({ url }) => {
