@@ -1,30 +1,30 @@
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer, gql } = require('apollo-server')
 
-// The GraphQL schema
 const typeDefs = gql`
   type Query {
-    hello: String
-    mockedString: String
+    hello: Float
+    resolved: String
   }
-`;
+`
 
-// A map of functions which return data for the schema.
 const resolvers = {
   Query: {
-    hello: () =>
-      fetch('https://fourtonfish.com/hellosalut/?mode=auto')
-        .then(res => res.json())
-        .then(data => data.hello),
+    resolved: () => 'Resolved',
   },
-};
+}
+
+const mocks = {
+  Int: () => 6,
+  Float: () => 22.1,
+  String: () => 'Hello',
+}
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  mocks: true,
-  onHealthCheck: () => fetch('https://fourtonfish.com/hellosalut/?mode=auto'),
-});
+  mocks,
+})
 
 server.listen().then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
-});
+  console.log(`🚀 Server ready at ${url}`)
+})
